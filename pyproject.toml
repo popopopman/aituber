@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "aituber"
+version = "0.1.0"
+description = "aituber project using Poetry, Bedrock, Voicevox, and Sounddevice"
+authors = ["popopopman"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+boto3 = ">=1.28,<1.29"
+botocore = ">=1.31,<1.32"
+requests = "*"
+sounddevice = "*"
+soundfile = "*"
+python-dotenv = "*"
+obsws-python = "*"
+# Google API 関連ライブラリを追加
+google-api-python-client = "*"
+obs-websocket-py = "*"
+
+[build-system]
+requires = ["poetry-core>=1.5.0"]
+build-backend = "poetry.core.masonry.api"
