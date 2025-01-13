@@ -13,7 +13,7 @@ poetry install
 docker pull voicevox/voicevox_engine:nvidia-latest
 
 ## 実行
-.aituber\Scripts\activate
 docker run --rm --gpus all -p '127.0.0.1:50021:50021' voicevox/voicevox_engine:nvidia-latest
+.aituber\Scripts\activate
 python main.py
 
