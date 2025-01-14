@@ -1,3 +1,0 @@
-{
-    "copyFrom": "arn:aws:bedrock:ap-northeast-1::foundation-model/anthropic.claude-3-haiku-20240307-v1:0"
-}
