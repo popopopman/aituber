@@ -1,19 +1,19 @@
 import requests
 import json
 import time
-import logging
+import sounddevice as sd
+import soundfile as sf
+import os
+from utils.logger import setup_logger
 
-# ロガーの設定
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-logger = logging.getLogger(__name__)
+logger = setup_logger(__name__)
 
-
-class VoicevoxSynthesizer:
+class VoiceVoxSynthesizer:
     """
     Voicevox エンジンを使ってテキストを音声に変換するクラス
     """
 
-    def __init__(self, base_url="http://127.0.0.1:50021", max_retry=3, retry_interval=1):
+    def __init__(self, base_url: str = "http://127.0.0.1:50021", max_retry: int = 3, retry_interval: int = 1):
         """
         :param base_url: Voicevox エンジンのベースURL
         :param max_retry: APIリクエストの最大リトライ回数
@@ -23,17 +23,18 @@ class VoicevoxSynthesizer:
         self.max_retry = max_retry
         self.retry_interval = retry_interval
 
-    def audio_query(self, text, speaker_id):
+    def audio_query(self, text: str, speaker_id: int) -> dict:
         """
         音声合成用クエリを作成します。
+        
         :param text: 合成するテキスト
         :param speaker_id: スピーカーID
         :return: audio_query API のレスポンスデータ
         """
-        query_payload = {"text": text, "speaker": speaker_id}
+        params = {"text": text, "speaker": speaker_id}
         for attempt in range(self.max_retry):
             try:
-                response = requests.post(f"{self.base_url}/audio_query", params=query_payload, timeout=(10.0, 300.0))
+                response = requests.post(f"{self.base_url}/audio_query", params=params, timeout=(10.0, 300.0))
                 response.raise_for_status()
                 return response.json()
             except requests.exceptions.RequestException as e:
@@ -41,9 +42,10 @@ class VoicevoxSynthesizer:
                 time.sleep(self.retry_interval)
         raise RuntimeError("audio_query API 接続に失敗しました。")
 
-    def synthesis(self, query_data, speaker_id):
+    def synthesis(self, query_data: dict, speaker_id: int) -> bytes:
         """
         音声を合成します。
+        
         :param query_data: audio_query API で取得したデータ
         :param speaker_id: スピーカーID
         :return: 音声データ (バイナリ)
@@ -67,9 +69,10 @@ class VoicevoxSynthesizer:
                 time.sleep(self.retry_interval)
         raise RuntimeError("synthesis API 接続に失敗しました。")
 
-    def synthesize(self, text, speaker_id=47, filename="output.wav"):
+    def synthesize(self, text: str, speaker_id: int = 47, filename: str = "output.wav") -> None:
         """
         テキストを音声に変換してファイルに保存します。
+        
         :param text: 合成するテキスト
         :param speaker_id: スピーカーID
         :param filename: 保存するファイル名
@@ -94,29 +97,19 @@ class VoicevoxSynthesizer:
         except IOError as e:
             raise RuntimeError(f"音声ファイルの保存中にエラーが発生しました: {e}")
 
-
-def main():
-    import sounddevice as sd
-    import soundfile as sf
-    import os
-
-    # テスト実行用
-    synthesizer = VoicevoxSynthesizer()
-    test_text = "これはボイスのテストです。"
-    try:
-        output_wav = "test_sasayaki.wav"
-        voicevox = VoicevoxSynthesizer()
-        voicevox.synthesize(text=test_text, speaker_id=47, filename=output_wav)
-        if os.path.exists(output_wav):
-            data, samplerate = sf.read(output_wav)
-            sd.play(data, samplerate)
-            sd.wait()  # 再生が終了するまで待機
-            logger.info("再生が完了しました")
-        else:
-            logger.error(f"エラー: ファイル '{output_wav}' が存在しません", exc_info=True)
-    except Exception as e:
-        logger.error(f"エラーが発生しました: {e}")
-
-
-if __name__ == "__main__":
-    main()
+    def play(self, filename: str = "output.wav") -> None:
+        """
+        指定されたファイルの音声データを再生します。
+        
+        :param filename: 再生する音声ファイル名
+        """
+        try:
+            if os.path.exists(filename):
+                data, samplerate = sf.read(filename)
+                sd.play(data, samplerate)
+                sd.wait()  # 再生が終了するまで待機
+                logger.info("再生が完了しました")
+            else:
+                logger.error(f"エラー: ファイル '{filename}' が存在しません")
+        except IOError as e:
+            raise RuntimeError(f"音声データの再生中にエラーが発生しました: {e}")

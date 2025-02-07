@@ -1,21 +1,27 @@
 [tool.poetry]
 name = "aituber"
 version = "0.1.0"
-description = "aituber project using Poetry, Bedrock, Voicevox, and Sounddevice"
+description = "AITuber project using Poetry, Bedrock, Voicevox, and Sounddevice"
 authors = ["popopopman"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-boto3 = ">=1.28,<1.29"
-botocore = ">=1.31,<1.32"
-requests = "*"
-sounddevice = "*"
-soundfile = "*"
-python-dotenv = "*"
-obsws-python = "*"
-# Google API 関連ライブラリを追加
-google-api-python-client = "*"
-obs-websocket-py = "*"
+boto3 = ">=1.28.57,<1.29"          # AWS SDK for Python (Bedrock対応バージョン)
+botocore = ">=1.31.57,<1.32"       # AWSサービスの低レベルクライアント (Bedrock対応バージョン)
+requests = "*"                      # HTTPリクエストライブラリ
+sounddevice = "*"                   # オーディオ再生用
+soundfile = "*"                     # オーディオファイル読み書き用
+python-dotenv = "*"                 # 環境変数を簡単に扱う
+obsws-python = "*"                  # OBS WebSocket用
+google-api-python-client = "*"      # Google API クライアント
+obs-websocket-py = "*"              # OBSのWebSocket用クライアント
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.0"                     # テストフレームワーク
+pytest-mock = "^3.0"                # モックを簡単に操作するためのプラグイン
+pytest-cov = "^4.0"                 # テストカバレッジ測定用 (オプション)
+flake8 = "*"                        # コードスタイルチェック用 (オプション)
+black = "*"                         # Pythonコードの自動整形用 (オプション)
 
 [build-system]
 requires = ["poetry-core>=1.5.0"]
