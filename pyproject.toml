@@ -26,9 +26,3 @@ black = "*"                         # Pythonコードの自動整形用 (オプ�
 [build-system]
 requires = ["poetry-core>=1.5.0"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.pytest.ini_options]
-pythonpath = ["src"]
-
-[tool.poetry.scripts]
-aituber = "src.app.main:main"

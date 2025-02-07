@@ -1,40 +1,63 @@
 # AITuber
 
-AITuber は、YouTube ライブチャットからメッセージを取得し、AI応答を生成、音声合成を行うプロジェクトです。
+YouTube ライブチャットからメッセージを取得し、AI応答を生成、音声合成を行うシステムです。
 
 ---
 
 ## 環境構築
 
 ### **1. Poetry のインストール**
+
 Poetry がインストールされていない場合は、以下のコマンドでインストールしてください。
 
-``` bash
+``` sh
 pip install --upgrade pip
 pip install poetry==1.5.1
 ```
 
 ### **2. プロジェクト依存関係のインストール**
+
 プロジェクトルートディレクトリで以下のコマンドを実行します。
 
-- 通常の依存関係のみインストールする場合:
-
-``` bash
+``` sh
 poetry install
 ```
 
-- 開発用依存関係も含めてインストールする場合:
+### **3. voicevox_engineのpull**
 
-``` bash
-poetry install --with dev
+VOICEVOX の音声合成エンジンのイメージをoullします。
+
+``` sh
+docker pull voicevox/voicevox_engine:nvidia-latest
 ```
 
-## 実行方法
-### **1. VOICEVOX エンジンの起動**
-VOICEVOX の音声合成エンジンを Docker を使用して起動します。
+### **4. .envファイルの作成**
 
-``` bash
-docker pull voicevox/voicevox_engine:nvidia-latest
+プロジェクトのルートディレクトリに `.env` ファイルを作成し、以下の情報を記述してください。
+
+``` sh
+PYTHONPATH=src
+AWS_ACCESS_KEY=YOUR_AWS_ACCESS_KEY
+AWS_SECRET_ACCESS_KEY=YOUR_AWS_SECRET_ACCESS_KEY
+AWS_REGION=ap-northeast-1
+YOUTUBE_API_KEY=YOUR_YOUTUBE_API_KEY
+MODEL_ARN=anthropic.claude-3-haiku-20240307-v1:0
+```
+
+- `PYTHONPATH`: Pythonのモジュール検索パス
+- `AWS_ACCESS_KEY`: AWSアクセスキー
+- `AWS_SECRET_ACCESS_KEY`: AWSシークレットアクセスキー
+- `AWS_REGION`: AWSリージョン (例: `ap-northeast-1`)
+- `YOUTUBE_API_KEY`: YouTube Data API v3が利用可能なAPIキー
+- `MODEL_ARN`: 使用するAIモデルのARN（claudeを想定した実装になっている）
+
+## 実行方法
+
+### **1. VOICEVOX エンジンの起動**
+
+VOICEVOX の音声合成エンジンを起動します。
+
+``` sh
 docker run --rm --gpus all -p '127.0.0.1:50021:50021' voicevox/voicevox_engine:nvidia-latest
 ```
 
@@ -44,7 +67,7 @@ docker run --rm --gpus all -p '127.0.0.1:50021:50021' voicevox/voicevox_engine:n
 ### **2. プロジェクトの実行**
 以下のコマンドでスクリプトを実行します。
 
-``` bash
+``` sh
 poetry run python src/app/main.py
 ```
 
@@ -65,31 +88,3 @@ poetry run pytest
 ``` bash
 poetry run pytest --cov=src
 ```
-
-## その他のコマンド
-
-### 依存関係のロック
-
-依存関係を更新した場合、poetry.lock を生成または更新します。
-
-``` bash
-poetry lock
-```
-
-``` plaintext
-ディレクトリ構成
-plaintextaituber/
-├── src/
-│   ├── app/                # アプリケーションのエントリーポイント
-│   │   └── main.py
-│   ├── domain/             # ドメインロジック
-│   ├── infrastructure/     # 外部サービスとの連携
-│   ├── presentation/       # CLI や API を通じた入出力
-│   └── tests/              # テストコード
-├── pyproject.toml          # Poetry 設定ファイル
-└── poetry.lock             # 依存関係のロックファイル
-```
-
-## 注意事項
-
-VOICEVOX エンジンを起動するには、Docker がインストールされている必要があります。
